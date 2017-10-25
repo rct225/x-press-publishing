@@ -54,3 +54,27 @@ seriesRouter.post('/', (req, res, next) => {
 seriesRouter.get('/:id', (req, res, next) => {
   res.status(200).json({series: req.series});
 });
+
+seriesRouter.put('/:id', (req, res, next) => {
+  const seriesName = req.body.series.name;
+  const seriesDescription = req.body.series.description;
+  if (!seriesName || !seriesDescription) {
+    res.status(400).send();
+  } else {
+    db.run('UPDATE Series SET name = $name, description = $description',
+           {
+             $name: seriesName,
+             $description: seriesDescription
+           }, function(err) {
+              if (err) {
+                next(err);
+              } else {
+                db.get(`SELECT * FROM Series WHERE id = ${req.params.id}`,
+                  (error, row) => {
+                    res.status(200).json({series: row});
+                  });
+              }
+           }
+         );
+  }
+});
