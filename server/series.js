@@ -7,6 +7,17 @@ module.exports = seriesRouter;
 const sqlite3 = require('sqlite3');
 const db = new sqlite3.Database(process.env.TEST_DATABASE || './database.sqlite');
 
+seriesRouter.param('id', (req, res, next, id) => {
+  db.get('SELECT * FROM Series where id=$id', { $id: id }, (error, row) => {
+    if (row) {
+      req.series = row;
+      next();
+    } else {
+      res.status(404).send();
+    }
+  });
+});
+
 seriesRouter.get('/', (req, res, next) => {
   db.all('SELECT * FROM Series', (err, rows) => {
     if (err) {
@@ -38,4 +49,8 @@ seriesRouter.post('/', (req, res, next) => {
       }
     });
   }
+});
+
+seriesRouter.get('/:id', (req, res, next) => {
+  res.status(200).json({series: req.series});
 });
