@@ -1,6 +1,6 @@
 const express = require('express');
 
-const seriesRouter = express.Router({mergeParams: true});
+const seriesRouter = express.Router();
 
 const issuesRouter = require('./issues');
 seriesRouter.use('/:id/issues', issuesRouter);
