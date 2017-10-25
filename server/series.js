@@ -1,6 +1,9 @@
 const express = require('express');
 
-const seriesRouter = express.Router();
+const seriesRouter = express.Router({mergeParams: true});
+
+const issuesRouter = require('./issues');
+seriesRouter.use('/:id/issues', issuesRouter);
 
 module.exports = seriesRouter;
 
@@ -77,4 +80,24 @@ seriesRouter.put('/:id', (req, res, next) => {
            }
          );
   }
+});
+
+seriesRouter.delete('/:id', (req, res, next) => {
+  db.get('SELECT * FROM Issue where series_id = $id', { $id: req.params.id },
+          (error, row) => {
+            if (error) {
+              next(error);
+            } else if (row) {
+              res.status(400).send();
+            } else {
+              db.run('DELETE FROM Series WHERE id = $id', { $id: req.params.id},
+                      (error) => {
+                        if (error) {
+                          next(error);
+                        } else {
+                          res.status(204).send();
+                        }
+                    });
+            }
+          });
 });
