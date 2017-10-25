@@ -108,11 +108,26 @@ issuesRouter.put('/:issueId', (req, res, next) => {
            } else {
              db.get(`SELECT * FROM Issue WHERE Issue.id = ${req.issueId}`,
                (error, row) => {
-                 res.status(200).json({issue: row});
+                 res.status(200
+
+
+
+                 ).json({issue: row});
                });
            }
          }
         );
 
 
+});
+
+issuesRouter.delete('/:issueId', (req, res, next) => {
+  db.run('DELETE FROM Issue WHERE id = $id', { $id: req.issueId},
+        (err) => {
+          if (err) {
+            next(err);
+          } else {
+            res.status(204).send();
+          }
+        });
 });
